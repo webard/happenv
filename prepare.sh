@@ -36,3 +36,4 @@ sed -i -e 's/include \/etc\/nginx\/conf\.d\/\*\.conf\;/include \/etc\/nginx\/con
 service nginx restart
 service mysql restart
 mysql -uroot -p$mypass -e "use mysql;CREATE USER 'oozaru'@'localhost' IDENTIFIED WITH mysql_native_password BY '$MYSQL_OOZARU_PASSWORD';GRANT ALL ON *.* TO 'oozaru'@'localhost';flush privileges;"
+

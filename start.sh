@@ -19,7 +19,7 @@ EOF
 chmod 0600 -R /root/.ssh
 apt install git -yqq
 if [ ! -n "$(grep "^github.com " /root/.ssh/known_hosts)" ]; then ssh-keyscan github.com >> /root/.ssh/known_hosts 2>/dev/null; fi
-git clone git@github.com:webard/sylaunch.git /root/sylaunch
-chmod 700 -R /root/sylaunch
-ln -s /root/sylaunch/launch.sh /usr/bin/sylaunch 
-bash /root/sylaunch/prepare.sh
+git clone git@github.com:webard/sylaunch.git /usr/lib/happenv
+chmod 700 -R /usr/lib/happenv
+ln -s /usr/lib/happenv/launch.sh /usr/bin/sylaunch 
+bash /usr/lib/happenv/prepare.sh
