@@ -29,35 +29,51 @@ $actions = [
 
         return $output;
     },
-    'enable' => function () {
+    'enable' => function () use ($avaialblePhpVersions) {
         if (empty($_GET['domain']) || !is_fqdn($_GET['domain'])) {
             die('No or invalid domain');
         }
         $domain = $_GET['domain'];
 
-        exec('bash /usr/lib/happenv/action.sh enable "' . $domain . '"', $output);
+        if (empty($_GET['phpver']) || !in_array($_GET['phpver'], $avaialblePhpVersions)) {
+            die('No or invalid PHP version');
+        }
+        $phpVersion = $_GET['phpver'];
+
+        exec('bash /usr/lib/happenv/action.sh enable "' . $domain . '" "' . $phpVersion . '"', $output);
 
         return $output;
     },
 
-    'disable' => function () {
+    'disable' => function () use ($avaialblePhpVersions) {
         if (empty($_GET['domain']) || !is_fqdn($_GET['domain'])) {
             die('No or invalid domain');
         }
         $domain = $_GET['domain'];
 
-        exec('bash /usr/lib/happenv/action.sh disable "' . $domain . '"', $output);
+        if (empty($_GET['phpver']) || !in_array($_GET['phpver'], $avaialblePhpVersions)) {
+            die('No or invalid PHP version');
+        }
+        $phpVersion = $_GET['phpver'];
+
+        exec('bash /usr/lib/happenv/action.sh disable "' . $domain . '" "' . $phpVersion . '"', $output);
 
         return $output;
     },
 
-    'remove' => function () {
+    'remove' => function () use ($avaialblePhpVersions) {
         if (empty($_GET['domain']) || !is_fqdn($_GET['domain'])) {
             die('No or invalid domain');
         }
         $domain = $_GET['domain'];
 
-        exec('bash /usr/lib/happenv/action.sh remove "' . $domain . '"', $output);
+
+        if (empty($_GET['phpver']) || !in_array($_GET['phpver'], $avaialblePhpVersions)) {
+            die('No or invalid PHP version');
+        }
+        $phpVersion = $_GET['phpver'];
+
+        exec('bash /usr/lib/happenv/action.sh remove "' . $domain . '" "' . $phpVersion . '"', $output);
 
         return $output;
     }
