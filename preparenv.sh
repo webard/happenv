@@ -30,14 +30,17 @@ mkdir /etc/nginx/sites-available
 sed -i -e 's/include \/etc\/nginx\/conf\.d\/\*\.conf\;/include \/etc\/nginx\/conf\.d\/\*\.conf\;\'$'\n    include \/etc\/nginx\/sites\-enabled\/\*\.conf\;/g' /etc/nginx/nginx.conf
 service nginx restart
 
-service mysql restart
-mysql -uroot -p$mypass -e "use mysql;CREATE USER 'oozaru'@'localhost' IDENTIFIED WITH mysql_native_password BY '$MYSQL_OOZARU_PASSWORD';GRANT ALL ON *.* TO 'oozaru'@'localhost';flush privileges;"
+# mysql
 cat <<EOF >> /etc/mysql/conf.d/sylapi.cnf
 [mysqld]
 sql-mode="STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
 character-set-server=utf8mb4
 default_authentication_plugin=mysql_native_password
 EOF
+service mysql restart
+mysql -uroot -p$mypass -e "use mysql;CREATE USER 'oozaru'@'localhost' IDENTIFIED WITH mysql_native_password BY '$MYSQL_OOZARU_PASSWORD';GRANT ALL ON *.* TO 'oozaru'@'localhost';flush privileges;"
 
+
+# happenv-admin service
 mkdir /etc/php/7.2/fpm/pools-available
-ln -s /usr/lib/happenv/happenv.service /etc/systemd/system/
+ln -s /usr/lib/happenv/happenv-admin.service /etc/systemd/system/happenv-admin.service
