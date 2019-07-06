@@ -176,35 +176,33 @@ if [ "$action" == 'create' ]
 		fi
 
          ### create PHP-FPM pool file
-		if ! echo "
-          [$domain]
-            user = $userAs
-            group = $user
-            listen = /run/php/php$phpVersion-fpm.$domain.sock
-            listen.owner = nginx
-            listen.group = nginx
-            pm = dynamic
-            pm.max_children = 10
-            pm.start_servers = 4
-            pm.min_spare_servers = 2
-            pm.max_spare_servers = 4
-            pm.max_requests = 500
-            env[HOSTNAME] = \$hostName
-            env[PATH] = /usr/local/bin:/usr/bin:/bin
-            env[TMP] = /var/www/$domain/tmp
-            env[TMPDIR] = /var/www/$domain/tmp
-            env[TEMP] = /var/www/$domain/tmp
-            request_terminate_timeout = 600
-            security.limit_extensions = .php
+		if ! echo "[$userAs]
+user = $userAs
+group = www-data
+listen = /run/php/php7.2-fpm.$domain.sock
+listen.owner = nginx
+listen.group = nginx
+pm = dynamic
+pm.max_children = 10
+pm.start_servers = 4
+pm.min_spare_servers = 2
+pm.max_spare_servers = 4
+pm.max_requests = 500
+request_terminate_timeout = 600
 
-            php_admin_value[cgi.fix_pathinfo] = 1
-            php_admin_value[post_max_size] = 1G
-            php_admin_value[upload_max_filesize] = 1G
-            php_admin_value[memory_limit] = 384M
+env[HOSTNAME] = \$hostName
+env[PATH] = /usr/local/bin:/usr/bin:/bin
+env[TMP] = /var/www/$domain/tmp
+env[TMPDIR] = /var/www/$domain/tmp
+env[TEMP] = /var/www/$domain/tmp
+security.limit_extensions = .php
+php_admin_value [cgi.fix_pathinfo] = 1
+php_admin_value[post_max_size] = 1G
+php_admin_value[upload_max_filesize] = 1G
+php_admin_value[memory_limit] = 384M
+php_admin_value[open_basedir] = /var/www/$domain:/tmp
+php_admin_value[display_errors] = Off
 
-            php_admin_value[open_basedir] = /var/www/$domain:/tmp
-            php_admin_value[display_errors] = Off
-            pm.status_path = {$domain//./}_status
         " > $phpFpmPoolsAvailable$domain.conf
 		then
 			echo -e $"There is an ERROR create PHP-FPM Pool $domain.conf. Probably PHP-FPM is not installed."
