@@ -49,6 +49,17 @@ $actions = [
         exec('bash /usr/lib/happenv/action.sh disable "' . $domain . '"', $output);
 
         return $output;
+    },
+
+    'remove' => function () {
+        if (empty($_GET['domain']) || !is_fqdn($_GET['domain'])) {
+            die('No or invalid domain');
+        }
+        $domain = $_GET['domain'];
+
+        exec('bash /usr/lib/happenv/action.sh remove "' . $domain . '"', $output);
+
+        return $output;
     }
 ];
 
