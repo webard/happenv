@@ -1,3 +1,4 @@
+#!/bin/bash
 cd /usr/lib/happenv
 git pull
 chmod 700 -R /usr/lib/happenv

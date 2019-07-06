@@ -26,7 +26,7 @@ if [ "$(whoami)" != 'root' ]; then
 		exit 1;
 fi
 
-if [ "$action" != 'create' ] && [ "$action" != 'delete' ]
+if [ "$action" != 'create' ] && [ "$action" != 'delete' ] && [ "$action" != 'enable' ] && [ "$action" != 'disable' ]
 	then
 		echo $"You need to prompt for action (create or delete) -- Lower-case only"
 		exit 1;
@@ -34,7 +34,7 @@ fi
 
 while [ "$domain" == "" ]
 do
-	echo -e $"Please provide domain. e.g.dev,staging"
+	echo -e $"Please provide domain name (fqdn)."
 	read domain
 done
 
@@ -63,14 +63,14 @@ if [ "$action" == 'create' ]
 			echo -e $"Please provide PHP version, eg. 7.2"
 			read phpVersion
 	done
-
-
-        adduser --disabled-password --gecos "" $userAs
 		### check if domain already exists
 		if [ -e $sitesAvailable$domain ]; then
 			echo -e $"This domain already exists.\nPlease Try Another one"
 			exit;
 		fi
+
+		### create user
+		adduser --disabled-password --gecos "" $userAs
 
 		### check if directory exists or not
 		if ! [ -d $userDir$rootDir ]; then
@@ -81,12 +81,14 @@ if [ "$action" == 'create' ]
 			### write test file in the new domain dir
 			if ! echo "<?php echo phpinfo(); ?>" > $userDir$rootDir/phpinfo.php
 				then
-					echo $"ERROR: Not able to write in file $userDir/$rootDir/phpinfo.php. Please check permissions."
+					echo $"[ERROR] Not able to write in $userDir/$rootDir/. Please check permissions."
 					exit;
 			else
+					### remove file
                     rm $userDir$rootDir/phpinfo.php
-					echo $"Added content to $userDir$rootDir/phpinfo.php."
+					echo $"[OK] $userDir$rootDir is writable"
 			fi
+			###TODO: should test if PHP is available
 		fi
 
 		### create virtual host rules file
@@ -134,14 +136,16 @@ if [ "$action" == 'create' ]
 
 		}" > $sitesAvailable$domain
 		then
-			echo -e $"There is an ERROR create $domain file"
+			echo -e $"[ERROR] Cannot create $sitesAvailable$domain file."
 			exit;
 		else
+			echo -e $"\nNew Virtual Host Created\n"
+		fi
 
          ### create PHP-FPM pool file
 		if ! echo "
           [$domain]
-            user = $user
+            user = $userAs
             group = $user
             listen = /run/php/php$phpVersion-fpm.$domain.sock
             listen.owner = nginx
@@ -160,7 +164,7 @@ if [ "$action" == 'create' ]
             request_terminate_timeout = 600
             security.limit_extensions = .php
 
-            php_admin_value [cgi.fix_pathinfo] = 1
+            php_admin_value[cgi.fix_pathinfo] = 1
             php_admin_value[post_max_size] = 1G
             php_admin_value[upload_max_filesize] = 1G
             php_admin_value[memory_limit] = 384M
@@ -168,7 +172,7 @@ if [ "$action" == 'create' ]
             php_admin_value[open_basedir] = /var/www/$domain:/tmp
             php_admin_value[display_errors] = Off
             pm.status_path = {$domain//./}_status
-        " > $phpFpmPools$domain.conf
+        " > $phpFpmPoolsAvailable$domain.conf
 		then
 			echo -e $"There is an ERROR create PHP-FPM Pool $domain.conf. Probably PHP-FPM is not installed."
 			exit;
@@ -176,8 +180,6 @@ if [ "$action" == 'create' ]
 			echo -e $"\nNew PHP-FPM Pool Created\n"
 		fi
 
-			echo -e $"\nNew Virtual Host Created\n"
-		fi
 
 		createHostname($domain)	
 
@@ -189,6 +191,9 @@ if [ "$action" == 'create' ]
 
 		### enable website
 		ln -s $sitesAvailable$domain $sitesEnable$domain
+
+		### enable PHP FPM pool
+		ln -s $phpFpmPoolsAvailable$domain.conf $phpFpmPoolsEnabled$domain.conf
 
 		### restart Nginx
 		service nginx restart
@@ -213,9 +218,12 @@ elif [ "$action" == 'enable' ] then
 				sed -i "/$newhost/d" /mnt/c/Windows/System32/drivers/etc/hosts
 			fi
 
-			### disable website
-			rm $sitesEnable$domain
-			mv 
+			### enable website
+			ln -s $sitesAvailable$domain $sitesEnable$domain
+
+			### enable PHP FPM pool
+			ln -s $phpFpmPoolsAvailable$domain.conf $phpFpmPoolsEnabled$domain.conf
+
 			### restart Nginx
 			service nginx reload
             service php7.2-fpm reload
@@ -234,7 +242,10 @@ elif [ "$action" == 'disable' ] then
 
 			### disable website
 			rm $sitesEnable$domain
-			mv 
+
+			### disable PHP FPM pool
+			rm $phpFpmPoolsEnabled$domain.conf
+
 			### restart Nginx
 			service nginx reload
             service php7.2-fpm reload
@@ -249,20 +260,11 @@ elif [ "$action" == 'remove' ] then
 			echo -e $"This domain dont exists.\nPlease Try Another one"
 			exit;
 		else
-			### Delete domain in /etc/hosts
-			newhost=${domain//./\\.}
-			sed -i "/$newhost/d" /etc/hosts
-
-			### Delete domain in /mnt/c/Windows/System32/drivers/etc/hosts (Windows Subsytem for Linux)
-			if [ -e /mnt/c/Windows/System32/drivers/etc/hosts ]
-			then
-				newhost=${domain//./\\.}
-				sed -i "/$newhost/d" /mnt/c/Windows/System32/drivers/etc/hosts
-			fi
+			delete_hostname($domain)
 
 			### disable website
 			rm $sitesEnable$domain
-            rm $phpFpmPools$domain.conf
+            rm $phpFpmPoolsEnabled$domain.conf
             deluser $userAs
 
 			### restart Nginx
@@ -271,6 +273,7 @@ elif [ "$action" == 'remove' ] then
 
 			### Delete virtual host rules files
 			rm $sitesAvailable$domain
+			rm $phpFpmPoolsAvailable$domain.conf
 		fi
 
 		### check if directory exists or not
