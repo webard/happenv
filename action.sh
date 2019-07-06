@@ -109,6 +109,7 @@ if [ "$action" == 'create' ]
 		if ! [ -d $userDir$rootDir ]; then
 			### create the directory
 			mkdir $userDir$rootDir
+			mkdir $userDir$rootDir/tmp
 			### give permission to root dir
 			chmod 755 $userDir$rootDir
 			### write test file in the new domain dir
@@ -127,9 +128,10 @@ if [ "$action" == 'create' ]
 		### create virtual host rules file
 		if ! echo "server {
 			listen   80;
-			root $userDir$rootDir;
+			root $userDir$rootDir/current/public;
 			index index.php;
 			server_name $domain;
+			
 
 			# serve static files directly
 			location ~* \.(jpg|jpeg|gif|css|png|js|ico|html)$ {
@@ -153,6 +155,10 @@ if [ "$action" == 'create' ]
 				rewrite ^/(.*)/index/?\$ /\$1 permanent;
 			}
 
+			location / {
+                try_files $uri $uri/ /index.php;
+        }
+
 			# catch all
 			error_page 404 /index.php;
 
@@ -161,6 +167,7 @@ if [ "$action" == 'create' ]
 				fastcgi_pass unix:/run/php/php$phpVersion-fpm.$domain.sock;
 				fastcgi_index index.php;
 				include fastcgi_params;
+				fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
 			}
 
 			location ~ /\.ht {
@@ -214,11 +221,13 @@ php_admin_value[display_errors] = Off
 
 		createHostname $domain
 
-		if [ "$owner" == "" ]; then
-			chown -R $(whoami):www-data $userDir$rootDir
-		else
-			chown -R $owner:www-data $userDir$rootDir
-		fi
+		#if [ "$owner" == "" ]; then
+		#	chown -R $(whoami):www-data $userDir$rootDir
+		#else
+			#chown -R $owner:www-data $userDir$rootDir
+		#fi
+
+		chown -R $userAs:$userAs $userDir$rootDir
 
 		### enable website
 		ln -s $sitesAvailable$domain $sitesEnable$domain
