@@ -2,10 +2,10 @@
 cd /usr/lib/happenv
 git pull
 chmod 700 -R /usr/lib/happenv
-rm /usr/bin/happenv
-ln -s /usr/lib/happenv/action.sh /usr/bin/happenv
-rm /etc/systemd/system/happenv.service
-ln -s /usr/lib/happenv/happenv.service /etc/systemd/system/happenv.service
+rm /usr/bin/happenv-admin
+ln -s /usr/lib/happenv/admin.sh /usr/bin/happenv-admin
+rm /etc/systemd/system/happenv-admin.service
+ln -s /usr/lib/happenv/happenv-admin.service /etc/systemd/system/happenv-admin.service
 systemctl daemon-reload
-systemctl enable happenv
-systemctl restart happenv
+systemctl enable happenv-admin
+systemctl restart happenv-admin
