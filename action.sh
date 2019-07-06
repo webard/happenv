@@ -237,6 +237,7 @@ php_admin_value[display_errors] = Off
 
 		### restart Nginx
 		service nginx restart
+		service php$phpVersion-fpm restart
 
 		### show the finished message
 		echo -e $"Complete! \nYou now have a new Virtual Host \nYour new host is: http://$domain \nAnd its located at $userDir$rootDir"
