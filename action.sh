@@ -111,7 +111,7 @@ if [ "$action" == 'create' ]
 			mkdir $userDir$rootDir
 			mkdir $userDir$rootDir/tmp
 			### give permission to root dir
-			chmod 755 $userDir$rootDir
+			chmod -R 700 $userDir$rootDir
 			### write test file in the new domain dir
 			if ! echo "<?php echo phpinfo(); ?>" > $userDir$rootDir/phpinfo.php
 				then
@@ -167,7 +167,7 @@ if [ "$action" == 'create' ]
 				fastcgi_pass unix:/run/php/php$phpVersion-fpm.$domain.sock;
 				fastcgi_index index.php;
 				include fastcgi_params;
-				fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
+				fastcgi_param SCRIPT_FILENAME \$document_root/\$fastcgi_script_name;
 			}
 
 			location ~ /\.ht {
