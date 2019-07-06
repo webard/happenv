@@ -229,7 +229,7 @@ elif [ "$action" == 'disable' ] ; then
 			echo -e $"This domain dont exists.\nPlease Try Another one"
 			exit;
 		else
-			deleteHostname $domain)
+			deleteHostname $domain
 
 			### disable website
 			rm $sitesEnable$domain
