@@ -23,11 +23,12 @@ $actions = [
         $phpVersion = $_GET['phpver'];
 
         $user = preg_replace('/^[a-zA-Z0-9\-]*/', '', str_replace('.', '-', $domain));
+        var_dump($user);
 
         exec('bash /usr/lib/happenv/action.sh create "' . $domain . '" "' . $user . '" "' . $phpVersion . '" "/var/www/' . $domain . '"', $output);
 
         return $output;
-    },
+    }
 
     'enable' => function () {
         if (empty($_GET['domain']) || !is_fqdn($_GET['domain'])) {

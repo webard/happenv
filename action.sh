@@ -7,7 +7,6 @@ action=$1
 domain=$2
 phpVersion=$3
 userAs=$4
-
 rootDir=$5
 owner=$(who am i | awk '{print $1}')
 sitesEnable='/etc/nginx/sites-enabled/'
@@ -262,7 +261,7 @@ elif [ "$action" == 'enable' ]; then
 		fi
 
 		### show the finished message
-		echo -e $"Complete!\nYou just disabled Virtual Host $domain"
+		echo -e $"Complete!\nYou just enabled Virtual Host $domain"
 		exit 0;
 elif [ "$action" == 'disable' ] ; then
 		### check whether domain already exists

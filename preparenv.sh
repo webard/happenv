@@ -40,3 +40,4 @@ default_authentication_plugin=mysql_native_password
 EOF
 
 mkdir /etc/php/7.2/fpm/pools-available
+ln -s /usr/lib/happenv/happenv.service /etc/systemd/system/
