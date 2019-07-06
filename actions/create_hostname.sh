@@ -1,4 +1,5 @@
-createHostname($domain) {
+createHostname() {
+    $domain = $1;
     ### Add domain in /etc/hosts
 		if ! echo "127.0.0.1	$domain" >> /etc/hosts
 			then

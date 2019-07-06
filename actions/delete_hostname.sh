@@ -1,4 +1,5 @@
-delete_hostname($domain) {
+deleteHostname() {
+    $domain = $1;
     ### Delete domain in /etc/hosts
 			newhost=${domain//./\\.}
 			sed -i "/$newhost/d" /etc/hosts

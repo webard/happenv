@@ -181,7 +181,7 @@ if [ "$action" == 'create' ]
 		fi
 
 
-		createHostname($domain)	
+		createHostname $domain
 
 		if [ "$owner" == "" ]; then
 			chown -R $(whoami):www-data $userDir$rootDir
@@ -207,17 +207,8 @@ elif [ "$action" == 'enable' ] then
 			echo -e $"This domain dont exists.\nPlease Try Another one"
 			exit;
 		else
-			### Delete domain in /etc/hosts
-			newhost=${domain//./\\.}
-			sed -i "/$newhost/d" /etc/hosts
-
-			### Delete domain in /mnt/c/Windows/System32/drivers/etc/hosts (Windows Subsytem for Linux)
-			if [ -e /mnt/c/Windows/System32/drivers/etc/hosts ]
-			then
-				newhost=${domain//./\\.}
-				sed -i "/$newhost/d" /mnt/c/Windows/System32/drivers/etc/hosts
-			fi
-
+			createHostname $domain
+			
 			### enable website
 			ln -s $sitesAvailable$domain $sitesEnable$domain
 
@@ -238,7 +229,7 @@ elif [ "$action" == 'disable' ] then
 			echo -e $"This domain dont exists.\nPlease Try Another one"
 			exit;
 		else
-			delete_hostname($domain)
+			deleteHostname $domain)
 
 			### disable website
 			rm $sitesEnable$domain
@@ -260,7 +251,7 @@ elif [ "$action" == 'remove' ] then
 			echo -e $"This domain dont exists.\nPlease Try Another one"
 			exit;
 		else
-			delete_hostname($domain)
+			deleteHostname $domain
 
 			### disable website
 			rm $sitesEnable$domain
