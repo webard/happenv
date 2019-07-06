@@ -25,7 +25,7 @@ $actions = [
         $user = preg_replace('/^[a-zA-Z0-9\-]*/', '', str_replace('.', '-', $domain));
         var_dump($user);
 
-        exec('bash /usr/lib/happenv/action.sh create "' . $domain . '" "' . $user . '" "' . $phpVersion . '" "/var/www/' . $domain . '"', $output);
+        exec('bash /usr/lib/happenv/action.sh create "' . $domain . '" "' . $phpVersion . '" "' . $user . '" "/var/www/' . $domain . '"', $output);
 
         return $output;
     },
