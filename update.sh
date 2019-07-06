@@ -6,5 +6,4 @@ ln -s /usr/lib/happenv/action.sh /usr/bin/happenv
 rm /etc/systemd/system/happenv.service
 ln -s /usr/lib/happenv/happenv.service /etc/systemd/system/happenv.service
 systemctl daemon-reload
-service happenv reenable
 service happenv restart
