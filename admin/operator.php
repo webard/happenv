@@ -67,13 +67,16 @@ $actions = [
         }
         $domain = $_GET['domain'];
 
+        //TODO: trim everything except a-zA-Z0-9\-
+        $user = str_replace('.', '-', $domain);
 
         if (empty($_GET['phpver']) || !in_array($_GET['phpver'], $avaialblePhpVersions)) {
             die('No or invalid PHP version');
         }
         $phpVersion = $_GET['phpver'];
 
-        exec('bash /usr/lib/happenv/action.sh remove "' . $domain . '" "' . $phpVersion . '"', $output);
+        exec('bash /usr/lib/happenv/action.sh remove "' . $domain . '" "' . $phpVersion . '" "' . $user . '" "/var/www/' . $domain . '"', $output);
+
 
         return $output;
     }
