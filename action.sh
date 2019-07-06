@@ -19,14 +19,13 @@ MY_DIR=$(dirname $(readlink -f $0))
 
 
 createHostname() {
-    $domain = $1;
     ### Add domain in /etc/hosts
 		if ! echo "127.0.0.1	$domain" >> /etc/hosts
 			then
-				echo $"ERROR: Not able write in /etc/hosts"
+				echo $"ERROR: Not able write $domain in /etc/hosts"
 				exit;
 		else
-				echo -e $"Host added to /etc/hosts file \n"
+				echo -e $"Host $domain added to /etc/hosts file \n"
 		fi
 
         ### Add domain in /mnt/c/Windows/System32/drivers/etc/hosts (Windows Subsytem for Linux)
@@ -42,7 +41,6 @@ createHostname() {
 }
 
 deleteHostname() {
-    $domain = $1;
     ### Delete domain in /etc/hosts
 			newhost=${domain//./\\.}
 			sed -i "/$newhost/d" /etc/hosts
