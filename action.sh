@@ -5,8 +5,9 @@ TEXTDOMAIN=virtualhost
 ### Set default parameters
 action=$1
 domain=$2
-userAs=$3
-phpVersion=$4
+phpVersion=$3
+userAs=$4
+
 rootDir=$5
 owner=$(who am i | awk '{print $1}')
 sitesEnable='/etc/nginx/sites-enabled/'
