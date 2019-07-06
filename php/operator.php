@@ -22,8 +22,8 @@ $actions = [
         }
         $phpVersion = $_GET['phpver'];
 
+        //TODO: trim everything except a-zA-Z0-9\-
         $user = str_replace('.', '-', $domain);
-        var_dump($user);
 
         exec('bash /usr/lib/happenv/action.sh create "' . $domain . '" "' . $phpVersion . '" "' . $user . '" "/var/www/' . $domain . '"', $output);
 
