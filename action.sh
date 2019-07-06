@@ -201,7 +201,7 @@ if [ "$action" == 'create' ]
 		### show the finished message
 		echo -e $"Complete! \nYou now have a new Virtual Host \nYour new host is: http://$domain \nAnd its located at $userDir$rootDir"
 		exit;
-elif [ "$action" == 'enable' ] then
+elif [ "$action" == 'enable' ]; then
 		### check whether domain already exists
 		if ! [ -e $sitesAvailable$domain ]; then
 			echo -e $"This domain dont exists.\nPlease Try Another one"
@@ -223,7 +223,7 @@ elif [ "$action" == 'enable' ] then
 		### show the finished message
 		echo -e $"Complete!\nYou just disabled Virtual Host $domain"
 		exit 0;
-elif [ "$action" == 'disable' ]; then
+elif [ "$action" == 'disable' ] ; then
 		### check whether domain already exists
 		if ! [ -e $sitesAvailable$domain ]; then
 			echo -e $"This domain dont exists.\nPlease Try Another one"
