@@ -28,8 +28,7 @@ $actions = [
         exec('bash /usr/lib/happenv/action.sh create "' . $domain . '" "' . $user . '" "' . $phpVersion . '" "/var/www/' . $domain . '"', $output);
 
         return $output;
-    }
-
+    },
     'enable' => function () {
         if (empty($_GET['domain']) || !is_fqdn($_GET['domain'])) {
             die('No or invalid domain');
