@@ -157,7 +157,7 @@ if [ "$action" == 'create' ]
 
 			location / {
                 try_files $uri $uri/ /index.php;
-        }
+        	}
 
 			# catch all
 			error_page 404 /index.php;
