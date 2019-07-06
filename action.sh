@@ -18,8 +18,42 @@ phpFpmPoolsAvailable="/etc/php/$phpVersion/fpm/pools-available/"
 MY_DIR=$(dirname $(readlink -f $0))
 
 
-$MY_DIR/actions/create_hostname.sh
-$MY_DIR/actions/delete_hostname.sh
+createHostname() {
+    $domain = $1;
+    ### Add domain in /etc/hosts
+		if ! echo "127.0.0.1	$domain" >> /etc/hosts
+			then
+				echo $"ERROR: Not able write in /etc/hosts"
+				exit;
+		else
+				echo -e $"Host added to /etc/hosts file \n"
+		fi
+
+        ### Add domain in /mnt/c/Windows/System32/drivers/etc/hosts (Windows Subsytem for Linux)
+		if [ -e /mnt/c/Windows/System32/drivers/etc/hosts ]
+		then
+			if ! echo -e "\r127.0.0.1       $domain" >> /mnt/c/Windows/System32/drivers/etc/hosts
+			then
+				echo $"ERROR: Not able to write in /mnt/c/Windows/System32/drivers/etc/hosts (Hint: Try running Bash as administrator)"
+			else
+				echo -e $"Host added to /mnt/c/Windows/System32/drivers/etc/hosts file \n"
+			fi
+		fi
+}
+
+deleteHostname() {
+    $domain = $1;
+    ### Delete domain in /etc/hosts
+			newhost=${domain//./\\.}
+			sed -i "/$newhost/d" /etc/hosts
+
+			### Delete domain in /mnt/c/Windows/System32/drivers/etc/hosts (Windows Subsytem for Linux)
+			if [ -e /mnt/c/Windows/System32/drivers/etc/hosts ]
+			then
+				newhost=${domain//./\\.}
+				sed -i "/$newhost/d" /mnt/c/Windows/System32/drivers/etc/hosts
+			fi
+}
 
 if [ "$(whoami)" != 'root' ]; then
 	echo $"You have no permission to run $0 as non-root user. Use sudo"
