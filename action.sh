@@ -309,16 +309,11 @@ elif [ "$action" == 'remove' ]; then
 
 		### check if directory exists or not
 		if [ -d $userDir$rootDir ]; then
-			echo -e $"Delete host root directory ? (s/n)"
-			read deldir
+			
 
-			if [ "$deldir" == 's' -o "$deldir" == 'S' ]; then
-				### Delete the directory
 				rm -rf $userDir$rootDir
 				echo -e $"Directory deleted"
-			else
-				echo -e $"Host directory conserved"
-			fi
+			
 		else
 			echo -e $"Host directory not found. Ignored"
 		fi
