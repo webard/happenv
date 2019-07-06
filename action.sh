@@ -2,7 +2,6 @@
 ### Set Language
 TEXTDOMAIN=virtualhost
 
-
 ### Set default parameters
 action=$1
 domain=$2
@@ -13,20 +12,14 @@ owner=$(who am i | awk '{print $1}')
 sitesEnable='/etc/nginx/sites-enabled/'
 sitesAvailable='/etc/nginx/sites-available/'
 userDir='/var/www/'
+phpFpmPoolsEnabled="/etc/php/$phpVersion/fpm/pool.d/"
+phpFpmPoolsAvailable="/etc/php/$phpVersion/fpm/pools-available/"
 
-while [ "$userAs" == "" ]
-do
-	echo -e $"Please provide username for website. User will be created in system."
-	read userAs
-done
+MY_DIR=$(dirname $(readlink -f $0))
 
-while [ "$phpVersion" == "" ]
-do
-	echo -e $"Please provide PHP version, eg. 7.2"
-	read phpVersion
-done
-phpFpmPools="/etc/php/$phpVersion/fpm/pool.d/"
 
+$MY_DIR/actions/create_hostname.sh
+$MY_DIR/actions/delete_hostname.sh
 
 if [ "$(whoami)" != 'root' ]; then
 	echo $"You have no permission to run $0 as non-root user. Use sudo"
@@ -58,6 +51,20 @@ rootDir=$userDir$rootDir
 
 if [ "$action" == 'create' ]
 	then
+
+	while [ "$userAs" == "" ]
+		do
+			echo -e $"Please provide username for website. User will be created in system."
+			read userAs
+	done
+
+	while [ "$phpVersion" == "" ]
+		do
+			echo -e $"Please provide PHP version, eg. 7.2"
+			read phpVersion
+	done
+
+
         adduser --disabled-password --gecos "" $userAs
 		### check if domain already exists
 		if [ -e $sitesAvailable$domain ]; then
@@ -172,25 +179,7 @@ if [ "$action" == 'create' ]
 			echo -e $"\nNew Virtual Host Created\n"
 		fi
 
-		### Add domain in /etc/hosts
-		if ! echo "127.0.0.1	$domain" >> /etc/hosts
-			then
-				echo $"ERROR: Not able write in /etc/hosts"
-				exit;
-		else
-				echo -e $"Host added to /etc/hosts file \n"
-		fi
-
-        ### Add domain in /mnt/c/Windows/System32/drivers/etc/hosts (Windows Subsytem for Linux)
-		if [ -e /mnt/c/Windows/System32/drivers/etc/hosts ]
-		then
-			if ! echo -e "\r127.0.0.1       $domain" >> /mnt/c/Windows/System32/drivers/etc/hosts
-			then
-				echo $"ERROR: Not able to write in /mnt/c/Windows/System32/drivers/etc/hosts (Hint: Try running Bash as administrator)"
-			else
-				echo -e $"Host added to /mnt/c/Windows/System32/drivers/etc/hosts file \n"
-			fi
-		fi
+		createHostname($domain)	
 
 		if [ "$owner" == "" ]; then
 			chown -R $(whoami):www-data $userDir$rootDir
@@ -207,7 +196,54 @@ if [ "$action" == 'create' ]
 		### show the finished message
 		echo -e $"Complete! \nYou now have a new Virtual Host \nYour new host is: http://$domain \nAnd its located at $userDir$rootDir"
 		exit;
-	else
+elif [ "$action" == 'enable' ] then
+		### check whether domain already exists
+		if ! [ -e $sitesAvailable$domain ]; then
+			echo -e $"This domain dont exists.\nPlease Try Another one"
+			exit;
+		else
+			### Delete domain in /etc/hosts
+			newhost=${domain//./\\.}
+			sed -i "/$newhost/d" /etc/hosts
+
+			### Delete domain in /mnt/c/Windows/System32/drivers/etc/hosts (Windows Subsytem for Linux)
+			if [ -e /mnt/c/Windows/System32/drivers/etc/hosts ]
+			then
+				newhost=${domain//./\\.}
+				sed -i "/$newhost/d" /mnt/c/Windows/System32/drivers/etc/hosts
+			fi
+
+			### disable website
+			rm $sitesEnable$domain
+			mv 
+			### restart Nginx
+			service nginx reload
+            service php7.2-fpm reload
+		fi
+
+		### show the finished message
+		echo -e $"Complete!\nYou just disabled Virtual Host $domain"
+		exit 0;
+elif [ "$action" == 'disable' ] then
+		### check whether domain already exists
+		if ! [ -e $sitesAvailable$domain ]; then
+			echo -e $"This domain dont exists.\nPlease Try Another one"
+			exit;
+		else
+			delete_hostname($domain)
+
+			### disable website
+			rm $sitesEnable$domain
+			mv 
+			### restart Nginx
+			service nginx reload
+            service php7.2-fpm reload
+		fi
+
+		### show the finished message
+		echo -e $"Complete!\nYou just disabled Virtual Host $domain"
+		exit 0;
+elif [ "$action" == 'remove' ] then
 		### check whether domain already exists
 		if ! [ -e $sitesAvailable$domain ]; then
 			echo -e $"This domain dont exists.\nPlease Try Another one"

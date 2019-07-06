@@ -24,15 +24,36 @@ $actions = [
 
         $user = preg_replace('/^[a-zA-Z0-9\-]*/', '', str_replace('.', '-', $domain));
 
-        exec('bash /root/sylaunch/action.sh create "' . $domain . '" "' . $user . '" "' . $phpVersion . '" "/var/www/' . $domain . '"', $output);
+        exec('bash /usr/lib/happenv/action.sh create "' . $domain . '" "' . $user . '" "' . $phpVersion . '" "/var/www/' . $domain . '"', $output);
+
+        return $output;
+    },
+
+    'enable' => function () {
+        if (empty($_GET['domain']) || !is_fqdn($_GET['domain'])) {
+            die('No or invalid domain');
+        }
+        $domain = $_GET['domain'];
+
+        exec('bash /usr/lib/happenv/action.sh enable "' . $domain . '"', $output);
+
+        return $output;
+    },
+
+    'disable' => function () {
+        if (empty($_GET['domain']) || !is_fqdn($_GET['domain'])) {
+            die('No or invalid domain');
+        }
+        $domain = $_GET['domain'];
+
+        exec('bash /usr/lib/happenv/action.sh disable "' . $domain . '"', $output);
 
         return $output;
     }
-
 ];
 
 if (empty($_GET['action']) || !isset($actions[$_GET['action']]) || !is_callable($actions[$_GET['action']])) {
     die('No or invalid action');
 }
 
-echo $actions[$_GET['action']]();
+print_r($actions[$_GET['action']]());

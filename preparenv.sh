@@ -24,16 +24,19 @@ debconf-set-selections <<< "mysql-community-server mysql-server/default-auth-ove
 apt update
 DEBIAN_FRONTEND=noninteractive apt install mysql-server -yqq
 apt install htop php7.2-fpm php7.2-cli php7.2-common php7.2-curl php7.2-mbstring php7.2-mysql php7.2-xml nginx dirmngr -yqq
+
 mkdir /etc/nginx/sites-enabled
 mkdir /etc/nginx/sites-available
+sed -i -e 's/include \/etc\/nginx\/conf\.d\/\*\.conf\;/include \/etc\/nginx\/conf\.d\/\*\.conf\;\'$'\n    include \/etc\/nginx\/sites\-enabled\/\*\.conf\;/g' /etc/nginx/nginx.conf
+service nginx restart
+
+service mysql restart
+mysql -uroot -p$mypass -e "use mysql;CREATE USER 'oozaru'@'localhost' IDENTIFIED WITH mysql_native_password BY '$MYSQL_OOZARU_PASSWORD';GRANT ALL ON *.* TO 'oozaru'@'localhost';flush privileges;"
 cat <<EOF >> /etc/mysql/conf.d/sylapi.cnf
 [mysqld]
 sql-mode="STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
 character-set-server=utf8mb4
 default_authentication_plugin=mysql_native_password
 EOF
-sed -i -e 's/include \/etc\/nginx\/conf\.d\/\*\.conf\;/include \/etc\/nginx\/conf\.d\/\*\.conf\;\'$'\n    include \/etc\/nginx\/sites\-enabled\/\*\.conf\;/g' /etc/nginx/nginx.conf
-service nginx restart
-service mysql restart
-mysql -uroot -p$mypass -e "use mysql;CREATE USER 'oozaru'@'localhost' IDENTIFIED WITH mysql_native_password BY '$MYSQL_OOZARU_PASSWORD';GRANT ALL ON *.* TO 'oozaru'@'localhost';flush privileges;"
 
+mkdir /etc/php/7.2/fpm/pools-available
