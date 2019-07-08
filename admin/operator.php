@@ -1,9 +1,7 @@
 <?php
 function is_fqdn($fqdn)
 {
-    return (preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i", $fqdn) //valid chars check
-        && preg_match("/^.{1,253}$/", $fqdn) //overall length check
-        && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*$/", $fqdn)); //length of each label
+    return (preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i", $fqdn) && preg_match("/^.{1,253}$/", $fqdn) && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*$/", $fqdn));
 }
 
 $avaialblePhpVersions = [
@@ -79,11 +77,12 @@ $actions = [
 
 
         return $output;
-    }
+    },
+    'install' => '',
 ];
 
 if (empty($_GET['action']) || !isset($actions[$_GET['action']]) || !is_callable($actions[$_GET['action']])) {
     die('No or invalid action');
 }
 
-print_r($actions[$_GET['action']]());
+$actions[$_GET['action']]();
